@@ -145,6 +145,9 @@ F. The query is a "covered index query".
 ```
 
 The answer is ABE.
+
 C-The index is only used in sorting.
+
 D-The skip(5000) means this five thousand won't be scanned.
+
 F-Have no idea.
