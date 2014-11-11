@@ -98,7 +98,13 @@ B. db.products.find({'brand':"GE"}).sort({price:1})
 C. db.products.find({$and:[{price:{$gt:30}},{price:{$lt:50}}]}).sort({brand:1})
 D. db.products.find({brand:'GE'}).sort({category:1, brand:-1}).explain()
 ```
-A-'brand' is not an index. B-'price' is an index and it is used in sort function. C-'price' is an index and being used for '$gt' function etc. Although this way is inefficient, index is still used. D-'category' is an index, but brand' isn't. So this query is only using basicCursor.
+A-'brand' is not an index. 
+
+B-'price' is an index and it is used in sort function. 
+
+C-'price' is an index and being used for '$gt' function etc. Although this way is inefficient, index is still used. 
+
+D-'category' is an index, but brand' isn't. So this query is only using basicCursor.
 
 
 ####HW-2
