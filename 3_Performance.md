@@ -4,7 +4,7 @@
 ###1. Indexes
 ```
 Index of (name, dob, hair_color)
-search from top to bottom
+// search from top to bottom
 name
 name_dob
 name_hair_color
@@ -65,22 +65,151 @@ db.students.ensureIndex({name:1}, {unique:true, dropDups:true})
 
 If you use dropDups, indexes will be deleted ever and forever.
 
+###6. Create sparse index
+```
+db.test.insert({a:1, b:2, c:3})
+db.test.insert({a:10, b:21})
+db.test.ensureIndex({a:1, b:1, c:1}, {unique:true, sparse:true})
+// In this case, sparse index will treat c:=null if one object has not c field.
+```
 
+###7. sort / hint and background / foreground
+```
+1. db.products.find().sort({size:1}) // return all products (with /without size field), use basic cursor
+2. db.products.find().sort({size:1}), hint({size:1}) // only return products with size field, and use binary cursor {size:1} whiche means index{size:1}
+```
+
+In MongoDB 2.4, both above two cases use size index. In MongoDB 2.6, you have to use .hint to tell mongodb to use that index. Otherwise, mongodb chooses not to use size index.
+
+If you do not want to use index
+```
+hint({$nature:1})
+```
+
+Foreground and background
+```
+default:foreground
+// fast
+// block writer
+// per DB block
+```
+
+```
+background:
+// slow
+// does not block writer
+```
+
+###8. Check if an index is used
+
+You may append .explain() command to check the operation detail.
+
+find() / findOne() / update / remove all operations use index
+```
+db.foo.ensureIndex({a:1,b:1,c:1})
+db.foo.find({a:5}) // use index
+db.foo.find({c:3}) // DOES NOT use index
+db.foo.find({c:3}).sort({a:1, b:1}) // use index
+db.foo.find({c:3}).sort({a:-1, b:1}) // DOES NOT use index
+db.foo.find({c:3}).sort({a:-1}) // use index
+```
+
+###9. Index size, cardinality
+```
+db.student.stats()  // find stats of this collection
+db.student.totalIndexSize() // find the size of a collection
+```
+
+Index is in disk, and we want to put index into memory. It is very important to fit index into memory, not data.
+
+Index cardinality
+```
+regular 1:1
+sparse  <= docs
+multi-key > docs
+```
+
+###10. Index selectivity
+```
+Use more selective key as an index
+```
 
 
 ###11. Hinting an Index
 
 ```
-.hint({a:1, b:1, c:1})
+.hint({a:1, b:1, c:1}) // Tell mongodb to use an index
 ```
-Tell mongodb to use an index
 
 ```
-hint({$nature:1})
+hint({$nature:1}) // Don't use an index.
 ```
-Don't use an index.
 
-Example: Which queries below will return all three documents for people collection? Check all that apply.
+###12. Efficiency of index use
+```
+$gt / $lt / $ne / regex
+```
+
+###13. Geospatial indexes
+```
+db.hotels.insert({location:[x,y]})
+db.hotels.ensureIndex({location:'2d', type:1}) // type:1 means ascending
+```
+
+```
+db.hotels.find({location:{$near:[x,y]}}).limit(20) // choose hotels based on distance
+```
+
+###14. Geospacial spherical
+
+(longitude, latitude), find more info from geojson.org
+
+```
+db.places.ensureIndex({location:'2dsphere'})
+db.stores.find({loc:{$near:{geometry:{type:"point", coordination:[-130,39], $maxDistance:10000}}}})
+```
+
+###15. Full text search
+```
+db.sentences.ensureIndex({'word':'text'})
+db.sentences.find({$text:{$search:'dog'}})
+db.sentences.find({$text: 
+                         {$search:'dogtreobsidian'}},
+                  {score:
+                         {$meta:'textScore'}}).sort({score:{$meta:'textScore'}})
+)
+```
+
+###16. Logging and profiling
+
+profiler
+
+system profiler
+
+```
+level 0 / off
+lever 1 / log slow queries
+lever 2 / log all queries //  debugging feature
+```
+
+```
+db.system.profile.find()
+db.getProfilingLevel()
+db.setProfilingStates(1, 4)
+db.setProfilingLevel(0)
+
+db.system.profile.find({$milis:{$gt:1000}}).sort({$ts:-1})
+```
+
+###17. MongoStat and Sharding
+```
+MongoStat() // look at overall mongo db stat
+```
+
+Insert must include full shard key for update / remove / find
+
+
+###18. Example: Which queries below will return all three documents for people collection? Check all that apply.
 
 ```
 db.people.find()
