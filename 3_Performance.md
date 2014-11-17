@@ -1,6 +1,73 @@
 
 
 
+###1. Indexes
+```
+Index of (name, dob, hair_color)
+search from top to bottom
+name
+name_dob
+name_hair_color
+name_dob_hair_color
+```
+
+If you have index, then read data fast but write data slow.
+
+###2. Create an index
+
+```
+db.student.ensureIndex({student:1, class:-1}) //1 means ascending, -1 means descending
+```
+
+###3. Discoving indexes
+
+```
+db.system.indexes.find() // find all indexes from a database
+```
+
+```
+db.students.getIndexes() // find all indexes from a collection
+```
+
+```
+db.students.dropIndex({"student":1}) // drop an index from a collection
+```
+
+###4. Multi-key index
+
+Example 1: Can't create index parallel arrays[a][b]
+```
+db.test.insert({a:1,b:1})
+db.test.ensureIndex({a:1, b:1})
+db.test.insert({a:[1,2,3], b:2}) // valid
+db.test.insert({a:[1,2,3], b:[4,5,6]}) // invalid
+```
+
+Example 2: For a subpart, you may able to create multi-key for two arrays
+```
+db.user.insert({
+    name:bryan,
+    tag: prime,
+    contacts: {phones:[1, 2,3], emails:[4,5,6]}
+})
+db.user.ensureIndex({contacts.phones:1, contacts.emails:1})
+```
+
+###5. Create an unique index
+```
+db.students.ensureIndex({name:1}, {unique:true})
+```
+
+Remove duplicates:
+```
+db.students.ensureIndex({name:1}, {unique:true, dropDups:true})
+```
+
+If you use dropDups, indexes will be deleted ever and forever.
+
+
+
+
 ###11. Hinting an Index
 
 ```
