@@ -11,14 +11,24 @@
 * 1.8 $out
 * 1.9 $ redact
 * 1.10 $geonear
-####2. Simple example
-####3. 
-
-####3. 
-####3. 
-####3. 
-####3. 
-####3. 
+* 1.11. Simple example
+####2. Compound grouping
+####3. $group--aggregation stage
+* 3.1 $sum
+* 3.2 $avg
+* 3.3 $addToSet
+* 3.4 $push
+* 3.5 $max and $min
+####4. Double grouping 
+####5. $project--aggregation stage 
+####6. $match--aggregation stage 
+####7. $sort--aggregation stage 
+####8. $first and $last 
+####9. $skip and $limit 
+####10. $unwind--aggregation stage 
+####11. Double $unwind 
+####12. Mapping between sql and aggregation
+####13. Limitation in aggregation framework
 
 
 
@@ -42,7 +52,6 @@ The following operations should be used within $group aggregation:
 * $max -> return a single result
 * $min > return a single result
 ```
-
 ```
 1.4 $sort -> sort doc, 1:1
 The following operations should be used within $sort aggregation:
@@ -56,7 +65,6 @@ The following operations should be used within $sort aggregation:
 
 ** Note: In aggregation, the order of them does matter. In find() operation, the order of them does not matter. MongoDB alwarys run sort, skip, and limit in sequence.**
 ```
-
 ```
 1.7 $unwind -> normalize doc, 1:n
 db.items.insert({_id:'nail', 'attributes':['hard', 'shiny', 'pointy', 'thin']});
@@ -68,20 +76,17 @@ result:
 'nail':'pointy'
 'nail':'thin'
 ```
-
 ```
 1.8 $out -> output to another collection, 1:1 // Usually, the result will return as a cursor
 ```
-
 ```
 1.9 $ redact -> Control certain use can see the fields
 ```
 ```
 1.10 $geonear -> location based queries
 ```
-
-####2. Simple example
 ```
+1.11. Simple example
 db.products.insert({'name':'iPad 16GB Wifi', 'manufacturer':"Apple", 
 		    'category':'Tablets', 
 		    'price':499.00})
@@ -114,7 +119,6 @@ db.products.insert({'name':'Kindle Fire', 'category':'Tablets',
 		    'price':199.00})
 		    
 ```
-
 ```
  db.products.aggregate([
     {$group:
@@ -127,7 +131,6 @@ db.products.insert({'name':'Kindle Fire', 'category':'Tablets',
 
 // _id is the $group factor
 ```
-
 ```
 {
     "result" : [ 
@@ -155,7 +158,6 @@ db.products.insert({'name':'Kindle Fire', 'category':'Tablets',
     "ok" : 1
 }
 ```
-
 ```
 products -> $group (Doing a upsert operation. If exist, update, otherwise, insert) -> result
 ```
