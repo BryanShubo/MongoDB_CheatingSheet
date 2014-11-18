@@ -43,6 +43,8 @@
 ####1. Aggregation pipeline
 ```
 collection->$project->$match->$group->$sort->result
+
+Syntax: db.foo.aggregate([{stage 1},{stage 2}...{stage n}])
 ```
 ```
 1.1 $project -> reshape doc, 1:1
