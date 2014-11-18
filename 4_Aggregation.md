@@ -375,3 +375,8 @@ Use the aggregation framework in the web shell to calculate the author with the 
 ```
 db.posts.aggregate([{$project:{_id:0,authors:"$comments.author"}},{$unwind:"$authors"}, {$group:{_id:"$authors",num:{$sum:1}}},{$sort:{num:-1}}])
 ```
+
+
+```
+mongoimport -d blog -c posts < posts.json
+```
