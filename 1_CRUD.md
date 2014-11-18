@@ -23,6 +23,15 @@ row is document
 3) Delete a database: 
 
 3. On Mac os, to run mongod and mongo: ./mongod or ./mongo
+4. 
+
+
+###4. drop a database
+```
+>use mydb
+switched to db mydb
+>db.dropDatabase()
+```
 
 
 
