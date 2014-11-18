@@ -380,3 +380,18 @@ db.posts.aggregate([{$project:{_id:0,authors:"$comments.author"}},{$unwind:"$aut
 ```
 mongoimport -d blog -c posts < posts.json
 ```
+
+
+$match sub-part
+```
+{
+  aggregate: 'Posts',
+  pipeline: [
+    { $unwind: '$Comments'},
+    { $match: {'Comments.Owner': 'Harry' }},
+    { $group: {
+      '_id': '$Comments._id'
+    }}
+  ]
+}
+```
