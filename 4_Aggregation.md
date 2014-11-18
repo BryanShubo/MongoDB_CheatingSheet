@@ -1,7 +1,25 @@
 ##Aggregation
 
-###1. Aggregation pipeline
-###2. 
+####1. Aggregation pipeline
+* 1.1 $project 
+* 1.2 $match 
+* 1.3 $group
+* 1.4 $sort
+* 1.5 $skip
+* 1.6 $limit
+* 1.7 $unwind
+* 1.8 $out
+* 1.9 $ redact
+* 1.10 $geonear
+####2. Simple example
+####3. 
+
+####3. 
+####3. 
+####3. 
+####3. 
+####3. 
+
 
 
 ####1. Aggregation pipeline
