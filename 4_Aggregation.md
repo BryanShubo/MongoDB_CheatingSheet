@@ -119,3 +119,132 @@ db.zips.aggregate([
 
 
 ```
+
+
+####9. $skip and $limit
+Usually, skip first and then limit. But in aggregation, the orders does matter.
+
+```
+use agg
+db.zips.aggregate([
+    {$match:
+     {
+	 state:"NY"
+     }
+    },
+    {$group:
+     {
+	 _id: "$city",
+	 population: {$sum:"$pop"},
+     }
+    },
+    {$project:
+     {
+	 _id: 0,
+	 city: "$_id",
+	 population: 1,
+     }
+    },
+    {$sort:
+     {
+	 population:-1
+     }
+    },
+    {$skip: 10},
+    {$limit: 5}
+])
+
+
+```
+
+
+####10. $first and $last
+
+```
+use agg
+db.zips.aggregate([
+    /* get the population of every city in every state */
+    {$group:
+     {
+	 _id: {state:"$state", city:"$city"},
+	 population: {$sum:"$pop"},
+     }
+    },
+     /* sort by state, population */
+    {$sort: 
+     {"_id.state":1, "population":-1}
+    },
+
+    /* group by state, get the first item in each group */
+    {$group: 
+     {
+	 _id:"$_id.state",
+	 city: {$first: "$_id.city"},
+	 population: {$first:"$population"}
+     }
+    },
+
+    /* now sort by state again */
+    {$sort:
+     {"_id":1}
+    }
+])
+```
+
+
+```
+use agg
+db.zips.aggregate([
+    /* get the population of every city in every state */
+    {$group:
+     {
+	 _id: {state:"$state", city:"$city"},
+	 population: {$sum:"$pop"},
+     }
+    }
+])
+```
+
+```
+use agg
+db.zips.aggregate([
+    /* get the population of every city in every state */
+    {$group:
+     {
+	 _id: {state:"$state", city:"$city"},
+	 population: {$sum:"$pop"},
+     }
+    },
+     /* sort by state, population */
+    {$sort: 
+     {"_id.state":1, "population":-1}
+    }
+])
+```
+
+
+```
+use agg
+db.zips.aggregate([
+    /* get the population of every city in every state */
+    {$group:
+     {
+	 _id: {state:"$state", city:"$city"},
+	 population: {$sum:"$pop"},
+     }
+    },
+     /* sort by state, population */
+    {$sort: 
+     {"_id.state":1, "population":-1}
+    },
+    /* group by state, get the first item in each group */
+    {$group: 
+     {
+	 _id:"$_id.state",
+	 city: {$first: "$_id.city"},
+	 population: {$first:"$population"}
+     }
+    }
+])
+
+```
