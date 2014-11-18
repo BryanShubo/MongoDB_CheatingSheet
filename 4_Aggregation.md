@@ -21,3 +21,101 @@ db.fun.aggregate([{$group:{_id:{a:"$a", b:"$b"}, c:{$max:"$c"}}}, {$group:{_id:"
 52 and 22
 ```
 
+####7. $match
+
+One thing to note about $match (and $sort) is that they can use indexes, but only if done at the beginning of the aggregation pipeline.
+
+
+use agg
+db.zips.aggregate([
+    {$match:
+     {
+	 state:"NY"
+     }
+    }
+])
+
+
+
+use agg
+db.zips.aggregate([
+    {$match:
+     {
+	 state:"NY"
+     }
+    },
+    {$group:
+     {
+	 _id: "$city",
+	 population: {$sum:"$pop"},
+	 zip_codes: {$addToSet: "$_id"}
+     }
+    }
+])
+
+
+
+
+
+use agg
+db.zips.aggregate([
+    {$match:
+     {
+	 state:"NY"
+     }
+    },
+    {$group:
+     {
+	 _id: "$city",
+	 population: {$sum:"$pop"},
+	 zip_codes: {$addToSet: "$_id"}
+     }
+    },
+    {$project:
+     {
+	 _id: 0,
+	 city: "$_id",
+	 population: 1,
+	 zip_codes:1
+     }
+    }
+     
+])
+
+
+
+####8. $sort
+
+```
+use agg
+db.zips.aggregate([
+    {$match:
+     {
+	 state:"NY"
+     }
+    },
+    {$group:
+     {
+	 _id: "$city",
+	 population: {$sum:"$pop"},
+     }
+    },
+    {$project:
+     {
+	 _id: 0,
+	 city: "$_id",
+	 population: 1,
+     }
+    },
+    {$sort:
+     {
+	 population:-1
+     }
+    }
+      
+    
+     
+])
+
+
+```
