@@ -510,7 +510,7 @@ db.zips.aggregate([
 ])
 ```
 
-####11. $unwind--aggregation stage
+####10. $unwind--aggregation stage
 
 Quiz
 ```
@@ -549,7 +549,7 @@ db.posts.aggregate([
     ])
 ```
 
-####12. Double $unwind
+####11. Double $unwind
 ```
 use agg;
 db.inventory.drop();
@@ -627,6 +627,25 @@ db.inventory.aggregate([
 
 ```
 
+####12. Mapping between sql and aggregation
+```
+where ----- $match
+group by -----$group
+having ----- $match
+select -----$project
+order by ----- $sort
+limit -----$limit
+sum ----- $sum
+count(*)---- $sum
+join ---- $unwind is a similar operation
+```
+
+####13. Limitation in aggregation framework
+* 100 MB limit for pipeline stage in memory. Disk has no limitation.
+* 16 MB limit for a single doc as return collection. Cursor has not limitation.
+* When aggregating large size of files, all aggregation stages operate in primary shard. In this case, consider other tools, such as hadoop.
+
+
 #### HW-1
 
 Use the aggregation framework in the web shell to calculate the author with the greatest number of comments. 
@@ -634,11 +653,9 @@ Use the aggregation framework in the web shell to calculate the author with the 
 db.posts.aggregate([{$project:{_id:0,authors:"$comments.author"}},{$unwind:"$authors"}, {$group:{_id:"$authors",num:{$sum:1}}},{$sort:{num:-1}}])
 ```
 
-
 ```
 mongoimport -d blog -c posts < posts.json
 ```
-
 
 $match sub-part
 ```
@@ -653,7 +670,6 @@ $match sub-part
   ]
 }
 ```
-
 
 ####HW-3
 
