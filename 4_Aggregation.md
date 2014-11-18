@@ -12,7 +12,7 @@
 * 1.9 $ redact
 * 1.10 $geonear
 * 1.11. Simple example
-* 
+
 ####2. Compound grouping
 
 ####3. $group--aggregation stage
@@ -22,7 +22,7 @@
 * 3.3 $addToSet
 * 3.4 $push
 * 3.5 $max and $min
-* 
+ 
 ####4. Double grouping 
 
 ####5. $project--aggregation stage 
