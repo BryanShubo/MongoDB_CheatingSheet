@@ -13,35 +13,30 @@
 * 1.10 $geonear
 * 1.11. Simple example
 
-####2. Compound grouping
+####2. $group--aggregation stage
+* 2.1 $sum
+* 2.2 $avg
+* 2.3 $addToSet
+* 2.4 $push
+* 2.5 $max and $min
+* 2.6 Compound grouping
+* 2.7 Double grouping
 
-####3. $group--aggregation stage
+####3. $project--aggregation stage 
 
-* 3.1 $sum
-* 3.2 $avg
-* 3.3 $addToSet
-* 3.4 $push
-* 3.5 $max and $min
- 
-####4. Double grouping 
+####4. $match--aggregation stage 
 
-####5. $project--aggregation stage 
+####5. $sort--aggregation stage 
+* 5.1 $first and $last 
 
-####6. $match--aggregation stage 
+####6. $skip and $limit--aggregation stage
 
-####7. $sort--aggregation stage 
+####7. $unwind--aggregation stage 
+* 7.1 Double $unwind 
 
-####8. $first and $last 
+####8. Mapping between sql and aggregation
 
-####9. $skip and $limit 
-
-####10. $unwind--aggregation stage 
-
-####11. Double $unwind 
-
-####12. Mapping between sql and aggregation
-
-####13. Limitation in aggregation framework
+####9. Limitation in aggregation framework
 
 
 
@@ -175,7 +170,83 @@ db.products.insert({'name':'Kindle Fire', 'category':'Tablets',
 products -> $group (Doing a upsert operation. If exist, update, otherwise, insert) -> result
 ```
 
-####2. Compound grouping
+####2. $group--aggregation stage
+
+#####2.1 $sum
+```
+db.products.aggregate([
+    {$group:
+     {
+	 _id: {
+	     "maker":"$manufacturer"
+	 },
+	 sum_prices:{$sum:"$price"}
+     }
+    }
+])
+
+```
+
+#####2.2 $avg
+```
+db.products.aggregate([
+    {$group:
+     {
+	 _id: {
+	     "category":"$category"
+	 },
+	 avg_price:{$avg:"$price"}
+     }
+    }
+])
+```
+
+#####2.3 $addToSet
+```
+db.products.aggregate([
+    {$group:
+     {
+	 _id: {
+	     "maker":"$manufacturer"
+	 },
+	 categories:{$addToSet:"$category"}
+     }
+    }
+])
+// To see how many categories of each manufacture carries.
+// Only add unique element to array.
+```
+
+#####2.4 $push
+```
+db.products.aggregate([
+    {$group:
+     {
+	 _id: {
+	     "maker":"$manufacturer"
+	 },
+	 categories:{$push:"$category"}
+     }
+    }
+])
+// Note: $push does not take care duplicates
+```
+
+#####2.5 $max and $min
+```
+db.products.aggregate([
+    {$group:
+     {
+	 _id: {
+	     "maker":"$manufacturer"
+	 },
+	 maxprice:{$max:"$price"}
+     }
+    }
+])
+```
+
+####2.6 Compound grouping
 ```
 db.products.aggregate([
     {$group:
@@ -192,83 +263,7 @@ Note: _id can be compound key, but has to be unique.
 db.foo.insert({_id:{name:"Bryan", hometown:"NY"}})
 ```
 
-####3. $group--aggregation stage
-
-#####3.1 $sum
-```
-db.products.aggregate([
-    {$group:
-     {
-	 _id: {
-	     "maker":"$manufacturer"
-	 },
-	 sum_prices:{$sum:"$price"}
-     }
-    }
-])
-
-```
-
-#####3.2 $avg
-```
-db.products.aggregate([
-    {$group:
-     {
-	 _id: {
-	     "category":"$category"
-	 },
-	 avg_price:{$avg:"$price"}
-     }
-    }
-])
-```
-
-#####3.3 $addToSet
-```
-db.products.aggregate([
-    {$group:
-     {
-	 _id: {
-	     "maker":"$manufacturer"
-	 },
-	 categories:{$addToSet:"$category"}
-     }
-    }
-])
-// To see how many categories of each manufacture carries.
-// Only add unique element to array.
-```
-
-#####3.4 $push
-```
-db.products.aggregate([
-    {$group:
-     {
-	 _id: {
-	     "maker":"$manufacturer"
-	 },
-	 categories:{$push:"$category"}
-     }
-    }
-])
-// Note: $push does not take care duplicates
-```
-
-#####3.5 $max and $min
-```
-db.products.aggregate([
-    {$group:
-     {
-	 _id: {
-	     "maker":"$manufacturer"
-	 },
-	 maxprice:{$max:"$price"}
-     }
-    }
-])
-```
-
-####4. Double grouping
+#####2.7 Double grouping
 ```
 db.grades.aggregate([
     {'$group':{_id:{class_id:"$class_id", student_id:"$student_id"}, 'average':{"$avg":"$score"}}},
@@ -293,7 +288,7 @@ db.fun.aggregate([{$group:{_id:{a:"$a", b:"$b"}, c:{$max:"$c"}}}, {$group:{_id:"
 52 and 22
 ```
 
-####5. $project--aggregation stage
+####3. $project--aggregation stage
 ```
 $project is used to:
 * remove keys
@@ -322,7 +317,7 @@ db.products.aggregate([
 ```
 
 
-####6. $match--aggregation stage
+####4. $match--aggregation stage
 
 * pre-aggregate filter
 * filter the result
@@ -383,7 +378,7 @@ db.zips.aggregate([
 ```
 
 
-####7. $sort--aggregation stage
+####5. $sort--aggregation stage
 * disk / memory based sort (100 Mb limit)
 * before or after grouping stage
 * $first and $last have to work with $sort
@@ -418,7 +413,7 @@ db.zips.aggregate([
 
 
 
-####8. $first and $last
+#####5.1. $first and $last
 
 ```
 use agg
@@ -509,7 +504,7 @@ db.zips.aggregate([
 
 ```
 
-####9. $skip and $limit
+####6. $skip and $limit
 * In find() operation, skip first and then limit. But in aggregation, the orders does matter.
 
 ```
@@ -543,7 +538,7 @@ db.zips.aggregate([
 ])
 ```
 
-####10. $unwind--aggregation stage
+####7. $unwind--aggregation stage
 
 Quiz
 ```
@@ -582,7 +577,7 @@ db.posts.aggregate([
     ])
 ```
 
-####11. Double $unwind
+#####7.1. Double $unwind
 ```
 use agg;
 db.inventory.drop();
@@ -660,7 +655,7 @@ db.inventory.aggregate([
 
 ```
 
-####12. Mapping between sql and aggregation
+####8. Mapping between sql and aggregation
 ```
 where ----- $match
 group by -----$group
@@ -673,7 +668,7 @@ count(*)---- $sum
 join ---- $unwind is a similar operation
 ```
 
-####13. Limitation in aggregation framework
+####9. Limitation in aggregation framework
 * 100 MB limit for pipeline stage in memory. Disk has no limitation.
 * 16 MB limit for a single doc as return collection. Cursor has not limitation.
 * When aggregating large size of files, all aggregation stages operate in primary shard. In this case, consider other tools, such as hadoop.
