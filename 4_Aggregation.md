@@ -12,22 +12,35 @@
 * 1.9 $ redact
 * 1.10 $geonear
 * 1.11. Simple example
+* 
 ####2. Compound grouping
+
 ####3. $group--aggregation stage
+
 * 3.1 $sum
 * 3.2 $avg
 * 3.3 $addToSet
 * 3.4 $push
 * 3.5 $max and $min
+* 
 ####4. Double grouping 
+
 ####5. $project--aggregation stage 
+
 ####6. $match--aggregation stage 
+
 ####7. $sort--aggregation stage 
+
 ####8. $first and $last 
+
 ####9. $skip and $limit 
+
 ####10. $unwind--aggregation stage 
+
 ####11. Double $unwind 
+
 ####12. Mapping between sql and aggregation
+
 ####13. Limitation in aggregation framework
 
 
