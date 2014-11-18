@@ -266,15 +266,34 @@ $project is used to:
 * remove keys
 * add new keys
 * reshape keys
-* use some simple functions
+* use some simple functions:
   * $toUpper
   * $toLower
   * $add
   * $multiply
 ```
-####7. $match
 
-One thing to note about $match (and $sort) is that they can use indexes, but only if done at the beginning of the aggregation pipeline.
+```
+db.products.aggregate([
+    {$project:
+     {
+	 _id:0,
+	 'maker': {$toLower:"$manufacturer"},
+	 'details': {'category': "$category",
+		     'price' : {"$multiply":["$price",10]}
+		    },
+	 'item':'$name'
+     }
+    }
+])
+```
+
+
+####6. $match
+
+* pre-aggregate filter
+* filter the result
+* One thing to note about $match (and $sort) is that they can use indexes, but only if done at the beginning of the aggregation pipeline.
 
 
 use agg
