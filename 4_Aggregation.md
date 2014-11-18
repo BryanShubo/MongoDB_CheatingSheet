@@ -367,3 +367,11 @@ db.inventory.aggregate([
 ])
 
 ```
+
+
+#### HW-1
+
+Use the aggregation framework in the web shell to calculate the author with the greatest number of comments. 
+```
+db.posts.aggregate([{$project:{_id:0,authors:"$comments.author"}},{$unwind:"$authors"}, {$group:{_id:"$authors",num:{$sum:1}}},{$sort:{num:-1}}])
+```
