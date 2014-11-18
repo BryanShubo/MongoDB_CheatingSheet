@@ -248,3 +248,122 @@ db.zips.aggregate([
 ])
 
 ```
+
+
+####11. $unwind
+
+```
+use agg;
+db.items.drop();
+db.items.insert({_id:'nail', 'attributes':['hard', 'shiny', 'pointy', 'thin']});
+db.items.insert({_id:'hammer', 'attributes':['heavy', 'black', 'blunt']});
+db.items.insert({_id:'screwdriver', 'attributes':['long', 'black', 'flat']});
+db.items.insert({_id:'rock', 'attributes':['heavy', 'rough', 'roundish']});
+db.items.aggregate([{$unwind:"$attributes"}]);
+
+```
+
+```
+use blog;
+db.posts.aggregate([
+    /* unwind by tags */
+    {"$unwind":"$tags"},
+    /* now group by tags, counting each tag */
+    {"$group": 
+     {"_id":"$tags",
+      "count":{$sum:1}
+     }
+    },
+    /* sort by popularity */
+    {"$sort":{"count":-1}},
+    /* show me the top 10 */
+    {"$limit": 10},
+    /* change the name of _id to be tag */
+    {"$project":
+     {_id:0,
+      'tag':'$_id',
+      'count' : 1
+     }
+    }
+    ])
+```
+
+
+####12. Double $unwind
+
+```
+use agg;
+db.inventory.drop();
+db.inventory.insert({'name':"Polo Shirt", 'sizes':["Small", "Medium", "Large"], 'colors':['navy', 'white', 'orange', 'red']})
+db.inventory.insert({'name':"T-Shirt", 'sizes':["Small", "Medium", "Large", "X-Large"], 'colors':['navy', "black",  'orange', 'red']})
+db.inventory.insert({'name':"Chino Pants", 'sizes':["32x32", "31x30", "36x32"], 'colors':['navy', 'white', 'orange', 'violet']})
+db.inventory.aggregate([
+    {$unwind: "$sizes"},
+    {$unwind: "$colors"},
+    /* create the color array */
+    {$group: 
+     {
+	'_id': {name:"$name",size:"$sizes"},
+	 'colors': {$push: "$colors"},
+     }
+    },
+    /* create the size array */
+    {$group: 
+     {
+	'_id': {'name':"$_id.name",
+		'colors' : "$colors"},
+	 'sizes': {$push: "$_id.size"}
+     }
+    },
+    /* reshape for beauty */
+    {$project: 
+     {
+	 _id:0,
+	 "name":"$_id.name",
+	 "sizes":1,
+	 "colors": "$_id.colors"
+     }
+    }
+])
+
+```
+
+```
+
+use agg;
+db.inventory.drop();
+db.inventory.insert({'name':"Polo Shirt", 'sizes':["Small", "Medium", "Large"], 'colors':['navy', 'white', 'orange', 'red']})
+db.inventory.insert({'name':"T-Shirt", 'sizes':["Small", "Medium", "Large", "X-Large"], 'colors':['navy', "black",  'orange', 'red']})
+db.inventory.insert({'name':"Chino Pants", 'sizes':["32x32", "31x30", "36x32"], 'colors':['navy', 'white', 'orange', 'violet']})
+db.inventory.aggregate([
+    {$unwind: "$sizes"},
+    {$unwind: "$colors"},
+    {$group: 
+     {
+	'_id': "$name",
+	 'sizes': {$addToSet: "$sizes"},
+	 'colors': {$addToSet: "$colors"},
+     }
+    }
+])
+
+```
+
+```
+use agg;
+db.inventory.drop();
+db.inventory.insert({'name':"Polo Shirt", 'sizes':["Small", "Medium", "Large"], 'colors':['navy', 'white', 'orange', 'red']})
+db.inventory.insert({'name':"T-Shirt", 'sizes':["Small", "Medium", "Large", "X-Large"], 'colors':['navy', "black",  'orange', 'red']})
+db.inventory.insert({'name':"Chino Pants", 'sizes':["32x32", "31x30", "36x32"], 'colors':['navy', 'white', 'orange', 'violet']})
+db.inventory.aggregate([
+    {$unwind: "$sizes"},
+    {$unwind: "$colors"},
+    {$group: 
+     {
+	'_id': {'size':'$sizes', 'color':'$colors'},
+	'count' : {'$sum':1}
+     }
+    }
+])
+
+```
