@@ -27,15 +27,17 @@ The following operations should be used within $group aggregation:
 
 ```
 1.4 $sort -> sort doc, 1:1
+The following operations should be used within $sort aggregation:
+* $first
+* $last
 ```
 ```
 1.5 $skip -> skip doc, n:1 (reduce the num of doc)
-```
-```
+
 1.6 $limit -> limit doc, n:1 (reduce the num of doc)
-```
 
 ** Note: In aggregation, the order of $skip and $limit does matter. In find() operation, the order does not matter. MongoDB alwarys run sort, skip, and limit in sequence.**
+```
 
 ```
 1.7 $unwind -> normalize doc, 1:n
@@ -140,9 +142,100 @@ db.products.insert({'name':'Kindle Fire', 'category':'Tablets',
 products -> $group (Doing a upsert operation. If exist, update, otherwise, insert) -> result
 ```
 
+####2. Compound grouping
+```
+db.products.aggregate([
+    {$group:
+     {
+	 _id: {
+	     "manufacturer":"$manufacturer", 
+	     "category" : "$category"},
+	 num_products:{$sum:1}
+     }
+    }
+])
 
+Note: _id can be compound key, but has to be unique.
+db.foo.insert({_id:{name:"Bryan", hometown:"NY"}})
+```
 
-####5. Double grouping
+####3. $group--aggregation expression
+
+#####3.1 $sum
+```
+db.products.aggregate([
+    {$group:
+     {
+	 _id: {
+	     "maker":"$manufacturer"
+	 },
+	 sum_prices:{$sum:"$price"}
+     }
+    }
+])
+
+```
+
+#####3.2 $avg
+```
+db.products.aggregate([
+    {$group:
+     {
+	 _id: {
+	     "category":"$category"
+	 },
+	 avg_price:{$avg:"$price"}
+     }
+    }
+])
+```
+
+#####3.3 $addToSet
+```
+db.products.aggregate([
+    {$group:
+     {
+	 _id: {
+	     "maker":"$manufacturer"
+	 },
+	 categories:{$addToSet:"$category"}
+     }
+    }
+])
+// To see how many categories of each manufacture carries.
+// Only add unique element to array.
+```
+
+#####3.4 $push
+```
+db.products.aggregate([
+    {$group:
+     {
+	 _id: {
+	     "maker":"$manufacturer"
+	 },
+	 categories:{$push:"$category"}
+     }
+    }
+])
+// Note: $push does not take care duplicates
+```
+
+#####3.5 $max and $min
+```
+db.products.aggregate([
+    {$group:
+     {
+	 _id: {
+	     "maker":"$manufacturer"
+	 },
+	 maxprice:{$max:"$price"}
+     }
+    }
+])
+```
+
+####4. Double grouping
 
 ```
 Given the following collection:
