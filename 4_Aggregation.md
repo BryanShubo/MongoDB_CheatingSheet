@@ -236,7 +236,12 @@ db.products.aggregate([
 ```
 
 ####4. Double grouping
-
+```
+db.grades.aggregate([
+    {'$group':{_id:{class_id:"$class_id", student_id:"$student_id"}, 'average':{"$avg":"$score"}}},
+    {'$group':{_id:"$_id.class_id", 'average':{"$avg":"$average"}}}])
+```
+Quiz:
 ```
 Given the following collection:
 > db.fun.find()
@@ -255,6 +260,18 @@ db.fun.aggregate([{$group:{_id:{a:"$a", b:"$b"}, c:{$max:"$c"}}}, {$group:{_id:"
 52 and 22
 ```
 
+####5. $project
+```
+$project is used to:
+* remove keys
+* add new keys
+* reshape keys
+* use some simple functions
+  * $toUpper
+  * $toLower
+  * $add
+  * $multiply
+```
 ####7. $match
 
 One thing to note about $match (and $sort) is that they can use indexes, but only if done at the beginning of the aggregation pipeline.
