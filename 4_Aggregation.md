@@ -11,7 +11,134 @@ collection->$project->$match->$group->$sort->result
 ```
 1.1 $project -> reshape doc, 1:1
 ```
+```
+1.2 $match -> filter doc, n:1 (reduce the number of doc)
+```
+```
+1.3 $group -> aggregation, n:1 (reduce the number of doc)
+The following operations should be used within $group aggregation:
+* $sum -> return a single result
+* $avg -> return a single result
+* $push -> return an array (with duplicates)
+* $addToSet -> return an array (without duplicates)
+* $max -> return a single result
+* $min > return a single result
+```
 
+```
+1.4 $sort -> sort doc, 1:1
+```
+```
+1.5 $skip -> skip doc, n:1 (reduce the num of doc)
+```
+```
+1.6 $limit -> limit doc, n:1 (reduce the num of doc)
+```
+
+** Note: In aggregation, the order of $skip and $limit does matter. In find() operation, the order does not matter. MongoDB alwarys run sort, skip, and limit in sequence.**
+
+```
+1.7 $unwind -> normalize doc, 1:n
+db.items.insert({_id:'nail', 'attributes':['hard', 'shiny', 'pointy', 'thin']});
+db.items.aggregate([{$unwind:"$attributes"}]);
+
+result:
+'nail':'hard'
+'nail':'shiny'
+'nail':'pointy'
+'nail':'thin'
+```
+
+```
+1.8 $out -> output to another collection, 1:1 // Usually, the result will return as a cursor
+```
+
+```
+1.9 $ redact -> Control certain use can see the fields
+```
+```
+1.10 $geonear -> location based queries
+```
+
+####2. Simple example
+```
+db.products.insert({'name':'iPad 16GB Wifi', 'manufacturer':"Apple", 
+		    'category':'Tablets', 
+		    'price':499.00})
+db.products.insert({'name':'iPad 32GB Wifi', 'category':'Tablets', 
+		    'manufacturer':"Apple", 
+		    'price':599.00})
+db.products.insert({'name':'iPad 64GB Wifi', 'category':'Tablets', 
+		    'manufacturer':"Apple", 
+		    'price':699.00})
+db.products.insert({'name':'Galaxy S3', 'category':'Cell Phones', 
+		    'manufacturer':'Samsung',
+		    'price':563.99})
+db.products.insert({'name':'Galaxy Tab 10', 'category':'Tablets', 
+		    'manufacturer':'Samsung',
+		    'price':450.99})
+db.products.insert({'name':'Vaio', 'category':'Laptops', 
+		    'manufacturer':"Sony", 
+		    'price':499.00})
+db.products.insert({'name':'Macbook Air 13inch', 'category':'Laptops', 
+		    'manufacturer':"Apple", 
+		    'price':499.00})
+db.products.insert({'name':'Nexus 7', 'category':'Tablets', 
+		    'manufacturer':"Google", 
+		    'price':199.00})
+db.products.insert({'name':'Kindle Paper White', 'category':'Tablets', 
+		    'manufacturer':"Amazon", 
+		    'price':129.00})
+db.products.insert({'name':'Kindle Fire', 'category':'Tablets', 
+		    'manufacturer':"Amazon", 
+		    'price':199.00})
+		    
+```
+
+```
+ db.products.aggregate([
+    {$group:
+     {
+	 _id:"$manufacturer", 
+	 num_products:{$sum:1}
+     }
+    }
+]) 
+
+// _id is the $group factor
+```
+
+```
+{
+    "result" : [ 
+        {
+            "_id" : "Amazon",
+            "num_products" : 2
+        }, 
+        {
+            "_id" : "Sony",
+            "num_products" : 1
+        }, 
+        {
+            "_id" : "Samsung",
+            "num_products" : 2
+        }, 
+        {
+            "_id" : "Google",
+            "num_products" : 1
+        }, 
+        {
+            "_id" : "Apple",
+            "num_products" : 4
+        }
+    ],
+    "ok" : 1
+}
+```
+
+```
+products -> $group (Doing a upsert operation. If exist, update, otherwise, insert) -> result
+```
 
 
 
