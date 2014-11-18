@@ -36,7 +36,7 @@ The following operations should be used within $sort aggregation:
 
 1.6 $limit -> limit doc, n:1 (reduce the num of doc)
 
-** Note: In aggregation, the order of $skip and $limit does matter. In find() operation, the order does not matter. MongoDB alwarys run sort, skip, and limit in sequence.**
+** Note: In aggregation, the order of them does matter. In find() operation, the order of them does not matter. MongoDB alwarys run sort, skip, and limit in sequence.**
 ```
 
 ```
@@ -159,7 +159,7 @@ Note: _id can be compound key, but has to be unique.
 db.foo.insert({_id:{name:"Bryan", hometown:"NY"}})
 ```
 
-####3. $group--aggregation expression
+####3. $group--aggregation stage
 
 #####3.1 $sum
 ```
@@ -260,7 +260,7 @@ db.fun.aggregate([{$group:{_id:{a:"$a", b:"$b"}, c:{$max:"$c"}}}, {$group:{_id:"
 52 and 22
 ```
 
-####5. $project
+####5. $project--aggregation stage
 ```
 $project is used to:
 * remove keys
@@ -289,13 +289,13 @@ db.products.aggregate([
 ```
 
 
-####6. $match
+####6. $match--aggregation stage
 
 * pre-aggregate filter
 * filter the result
 * One thing to note about $match (and $sort) is that they can use indexes, but only if done at the beginning of the aggregation pipeline.
 
-
+```
 use agg
 db.zips.aggregate([
     {$match:
@@ -304,9 +304,8 @@ db.zips.aggregate([
      }
     }
 ])
-
-
-
+```
+```
 use agg
 db.zips.aggregate([
     {$match:
@@ -322,11 +321,8 @@ db.zips.aggregate([
      }
     }
 ])
-
-
-
-
-
+```
+```
 use agg
 db.zips.aggregate([
     {$match:
@@ -351,13 +347,15 @@ db.zips.aggregate([
     }
      
 ])
+```
 
 
-
-####8. $sort
+####7. $sort--aggregation stage
+* disk / memory based sort (100 Mb limit)
+* before or after grouping stage
+* $first and $last have to work with $sort
 
 ```
-use agg
 db.zips.aggregate([
     {$match:
      {
@@ -382,53 +380,12 @@ db.zips.aggregate([
 	 population:-1
      }
     }
-      
-    
-     
 ])
-
-
 ```
 
 
-####9. $skip and $limit
-Usually, skip first and then limit. But in aggregation, the orders does matter.
 
-```
-use agg
-db.zips.aggregate([
-    {$match:
-     {
-	 state:"NY"
-     }
-    },
-    {$group:
-     {
-	 _id: "$city",
-	 population: {$sum:"$pop"},
-     }
-    },
-    {$project:
-     {
-	 _id: 0,
-	 city: "$_id",
-	 population: 1,
-     }
-    },
-    {$sort:
-     {
-	 population:-1
-     }
-    },
-    {$skip: 10},
-    {$limit: 5}
-])
-
-
-```
-
-
-####10. $first and $last
+####8. $first and $last
 
 ```
 use agg
@@ -519,9 +476,43 @@ db.zips.aggregate([
 
 ```
 
+####9. $skip and $limit
+* In find() operation, skip first and then limit. But in aggregation, the orders does matter.
 
-####11. $unwind
+```
+use agg
+db.zips.aggregate([
+    {$match:
+     {
+	 state:"NY"
+     }
+    },
+    {$group:
+     {
+	 _id: "$city",
+	 population: {$sum:"$pop"},
+     }
+    },
+    {$project:
+     {
+	 _id: 0,
+	 city: "$_id",
+	 population: 1,
+     }
+    },
+    {$sort:
+     {
+	 population:-1
+     }
+    },
+    {$skip: 10},
+    {$limit: 5}
+])
+```
 
+####11. $unwind--aggregation stage
+
+Quiz
 ```
 use agg;
 db.items.drop();
@@ -558,8 +549,46 @@ db.posts.aggregate([
     ])
 ```
 
-
 ####12. Double $unwind
+```
+use agg;
+db.inventory.drop();
+db.inventory.insert({'name':"Polo Shirt", 'sizes':["Small", "Medium", "Large"], 'colors':['navy', 'white', 'orange', 'red']})
+db.inventory.insert({'name':"T-Shirt", 'sizes':["Small", "Medium", "Large", "X-Large"], 'colors':['navy', "black",  'orange', 'red']})
+db.inventory.insert({'name':"Chino Pants", 'sizes':["32x32", "31x30", "36x32"], 'colors':['navy', 'white', 'orange', 'violet']})
+db.inventory.aggregate([
+    {$unwind: "$sizes"},
+    {$unwind: "$colors"},
+    {$group: 
+     {
+	'_id': {'size':'$sizes', 'color':'$colors'},
+	'count' : {'$sum':1}
+     }
+    }
+])
+
+```
+
+```
+
+use agg;
+db.inventory.drop();
+db.inventory.insert({'name':"Polo Shirt", 'sizes':["Small", "Medium", "Large"], 'colors':['navy', 'white', 'orange', 'red']})
+db.inventory.insert({'name':"T-Shirt", 'sizes':["Small", "Medium", "Large", "X-Large"], 'colors':['navy', "black",  'orange', 'red']})
+db.inventory.insert({'name':"Chino Pants", 'sizes':["32x32", "31x30", "36x32"], 'colors':['navy', 'white', 'orange', 'violet']})
+db.inventory.aggregate([
+    {$unwind: "$sizes"},
+    {$unwind: "$colors"},
+    {$group: 
+     {
+	'_id': "$name",
+	 'sizes': {$addToSet: "$sizes"},
+	 'colors': {$addToSet: "$colors"},
+     }
+    }
+])
+
+```
 
 ```
 use agg;
@@ -597,47 +626,6 @@ db.inventory.aggregate([
 ])
 
 ```
-
-```
-
-use agg;
-db.inventory.drop();
-db.inventory.insert({'name':"Polo Shirt", 'sizes':["Small", "Medium", "Large"], 'colors':['navy', 'white', 'orange', 'red']})
-db.inventory.insert({'name':"T-Shirt", 'sizes':["Small", "Medium", "Large", "X-Large"], 'colors':['navy', "black",  'orange', 'red']})
-db.inventory.insert({'name':"Chino Pants", 'sizes':["32x32", "31x30", "36x32"], 'colors':['navy', 'white', 'orange', 'violet']})
-db.inventory.aggregate([
-    {$unwind: "$sizes"},
-    {$unwind: "$colors"},
-    {$group: 
-     {
-	'_id': "$name",
-	 'sizes': {$addToSet: "$sizes"},
-	 'colors': {$addToSet: "$colors"},
-     }
-    }
-])
-
-```
-
-```
-use agg;
-db.inventory.drop();
-db.inventory.insert({'name':"Polo Shirt", 'sizes':["Small", "Medium", "Large"], 'colors':['navy', 'white', 'orange', 'red']})
-db.inventory.insert({'name':"T-Shirt", 'sizes':["Small", "Medium", "Large", "X-Large"], 'colors':['navy', "black",  'orange', 'red']})
-db.inventory.insert({'name':"Chino Pants", 'sizes':["32x32", "31x30", "36x32"], 'colors':['navy', 'white', 'orange', 'violet']})
-db.inventory.aggregate([
-    {$unwind: "$sizes"},
-    {$unwind: "$colors"},
-    {$group: 
-     {
-	'_id': {'size':'$sizes', 'color':'$colors'},
-	'count' : {'$sum':1}
-     }
-    }
-])
-
-```
-
 
 #### HW-1
 
