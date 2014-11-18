@@ -417,3 +417,28 @@ db.grades.aggregate([
     }
 ])
 ```
+
+
+####HW-4
+
+Using the aggregation framework, calculate the sum total of people who are living in a zip code where the city starts with a digit. Choose the answer below. 
+
+```
+db.zips.aggregate([
+     {$project:{
+               _id:0,
+               first_char:{$substr:["city", 0,1]},
+               pop:"$pop"
+               }
+     },
+     {$match: {
+              first_char:{$in:["0","1","2","3","4","5","6","7","8","9"]}
+              }
+     },
+     {$group:{
+              _id:0,
+              total:{$sum:"$pop"}
+             }
+     }
+])
+```
