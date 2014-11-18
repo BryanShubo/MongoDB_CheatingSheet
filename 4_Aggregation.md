@@ -1,3 +1,17 @@
+##Aggregation
+
+###1. Aggregation pipeline
+###2. 
+
+
+####1. Aggregation pipeline
+```
+collection->$project->$match->$group->$sort->result
+```
+```
+1.1 $project -> reshape doc, 1:1
+```
+
 
 
 
