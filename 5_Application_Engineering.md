@@ -28,5 +28,14 @@ Every node has one vote.
 
 #####4. Creating a replica set
 ```
-
+rs.status() // replica set status
+rs.slaveOk() // reading from secondary
+rs.isMaster() // check node if it is a master
 ```
+
+#####5. Failover and Rollback
+* It may take 3s to elect a new primary.
+* If a node comes back as a secondary node, the entire dataset will be copied from the primary.
+
+
+
