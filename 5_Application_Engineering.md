@@ -26,3 +26,7 @@ Every node has one vote.
 * Primary and secondary is asynchronised copying data. So if app reads data from secondary node, it may miss some data.
 * Eventual consistency (mongodb does not support this): if primary is down, app can't write any data to node during secondaries eletion. 'During the time when failover is occurring, cannot write successfully complete'
 
+#####4. Creating a replica set
+```
+
+```
