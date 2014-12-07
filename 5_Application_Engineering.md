@@ -5,9 +5,9 @@
 * Availability
 * Fault Tolenrence
 
-- Replica set: Primary, secondary, secondary
-- App -> primary
-- primary is down. Secondaries do election.
-- App -> new primary
-- If old primary is back, it is a secondary now.
+1.  Replica set: Primary, secondary, secondary
+2.  App -> primary
+3.  primary is down. Secondaries do election.
+4.  App -> new primary
+5.  If old primary is back, it is a secondary now.
 
