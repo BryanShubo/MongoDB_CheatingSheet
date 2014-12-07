@@ -38,5 +38,13 @@ rs.isMaster() // check node if it is a master
 * If a node comes back as a secondary node, the entire dataset will be copied from the primary.
 * w=1, j=1 guarantee that an insert, update, or delete has been persisted to disk.
 
+Network Errors: in this case, you won't get any acknowledgement so you are not sure the write is persisted or not. 
+```
+What are the reasons why an application may receive an error back even if the write was successful. Check all that apply.
+
+* The network TCP network connection between the application and the server was reset between the time of the write and the time of the getLastError call. 
+* The MongoDB server terminates between the write and the getLastError call. 
+* The network fails between the time of the write and the time of the getLastError call
+```
 
 
