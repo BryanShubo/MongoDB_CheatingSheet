@@ -36,6 +36,7 @@ rs.isMaster() // check node if it is a master
 #####5. Failover and Rollback
 * It may take 3s to elect a new primary.
 * If a node comes back as a secondary node, the entire dataset will be copied from the primary.
+* w=1, j=1 guarantee that an insert, update, or delete has been persisted to disk.
 
 
 
