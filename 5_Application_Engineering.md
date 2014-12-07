@@ -47,4 +47,15 @@ What are the reasons why an application may receive an error back even if the wr
 * The network fails between the time of the write and the time of the getLastError call
 ```
 
+#####6. Read Preference
+```
+primary // default
+secondary 
+secondary preference
+primary preference
+nearst // choose the ping time shortest one.
+```
 
+#####7. Sharding
+* range based
+* sharding key
