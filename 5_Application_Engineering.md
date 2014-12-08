@@ -58,4 +58,31 @@ nearst // choose the ping time shortest one.
 
 #####7. Sharding
 * range based
-* sharding key
+* sharding key // immutable
+* Index the shard key
+* shard key has to be specified
+* No shard key means search gather
+* No unique key, unless it is part of shard key
+
+```
+Suppose you wanted to shard the zip code collection after importing it. You want to shard on zip code. What index would be required to allow MongoDB to shard on zip code?
+
+An index on zip or a non-multi-key index that starts with zip.
+```
+
+#####8. Sharding and Replication
+
+Choosing a shard key
+
+* Sufficient cardinality
+* Hotspoting // like time stamp, it is increasing automatically.
+
+
+
+
+
+
+
+
+
+
