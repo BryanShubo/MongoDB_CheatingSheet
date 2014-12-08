@@ -77,7 +77,33 @@ Choosing a shard key
 * Sufficient cardinality
 * Hotspoting // like time stamp, it is increasing automatically.
 
+HW1
+```
+Which of the following statements are true about MongoDB replication. Check all that apply.
 
+The minimum sensible number of voting nodes to a replica set is three.
+MongoDB replication is asynchronous.
+By default, using the new MongoClient connection class, w=1 and j=0.
+The oplog utilizes a capped collection.
+```
+
+HW2
+```
+Let's suppose you have a five member replica set and want to assure that writes are committed to the journal and are acknowledged by at least 3 nodes before you proceed forward. What would be the appropriate settings for w and j?
+
+w=3, j=1 or w="majority", j=1
+```
+
+HW3
+```
+Which of the following statements are true about choosing and using a shard key:
+
+The shard key must be unique // wrong
+There must be a index on the collection that starts with the shard key. 
+Mongo can not enforce unique indexes on a sharded collection other than the shard key itself. 
+Any update that does not contain the shard key will be sent to all shards. 
+You can change the shard key on a collection if you desire. // wrong
+```
 
 
 
