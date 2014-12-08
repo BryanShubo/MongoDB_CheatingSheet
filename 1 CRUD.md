@@ -4,7 +4,9 @@
 
 ####3. Collection--create and delete
 
-
+```
+mongorestore --collection messages --db enron messages.bson
+```
 
 ####1. Introduction
 
